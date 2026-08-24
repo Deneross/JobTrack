@@ -1,4 +1,5 @@
 import type { Application } from '../api/applications';
+import { ApplicationCard } from './ApplicationCard';
 
 type ApplicationListProps = {
     applications: Application[];
@@ -14,17 +15,14 @@ export function ApplicationList({
             {applications.length === 0 ? (
                 <p>Aucune candidature.</p>
             ) : (
-                <ul>
+                <div>
                     {applications.map((application) => (
-                        <li key={application.id}>
-                            <strong>{application.company}</strong>
-                            {' — '}
-                            {application.position}
-                            {' — '}
-                            {application.status}
-                        </li>
+                        <ApplicationCard
+                            key={application.id}
+                            application={application}
+                        />
                     ))}
-                </ul>
+                </div>
             )}
         </section>
     );

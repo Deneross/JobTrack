@@ -66,4 +66,15 @@ export class ApplicationsController {
     remove(@Param('id', ParseIntPipe) id: number) {
         return this.applicationsService.remove(id);
     }
+
+    @Delete(':applicationId/events/:eventId')
+    removeEvent(
+        @Param('applicationId', ParseIntPipe) applicationId: number,
+        @Param('eventId', ParseIntPipe) eventId: number,
+    ) {
+        return this.applicationsService.removeEvent(
+            applicationId,
+            eventId,
+        );
+    }
 }

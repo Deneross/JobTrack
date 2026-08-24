@@ -203,4 +203,32 @@ export class ApplicationsService {
             byStatus,
         };
     }
+
+    async removeEvent(applicationId: number, eventId: number) {
+        // Vérifie que la candidature existe
+        await this.findOne(applicationId);
+
+        const event = await this.prisma.event.findUnique({
+            where: {
+                id: eventId,
+            },
+        });
+
+        if (!event || event.applicationId !== applicationId) {
+            throw new NotFoundException(`Événement ${eventId} introuvable`);
+        }
+
+        // Ces événements appartiennent au système
+        if (event.type === 'CREATED' || event.type === 'STATUS_CHANGED') {
+            throw new BadRequestException(
+                'Cet événement est généré automatiquement et ne peut pas être supprimé',
+            );
+        }
+
+        return this.prisma.event.delete({
+            where: {
+                id: eventId,
+            },
+        });
+    }
 }

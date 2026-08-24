@@ -1,1 +1,1 @@
-GET http://localhost:3000/applications/dashboard/stats
+DELETE http://localhost:3000/applications/3/events/1

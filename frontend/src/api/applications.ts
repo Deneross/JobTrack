@@ -56,3 +56,79 @@ export async function getDashboardStats(): Promise<DashboardStats> {
 
     return response.json();
 }
+
+export async function getApplication(
+    id: number,
+): Promise<ApplicationDetails> {
+    const response = await fetch(`${API_URL}/applications/${id}`);
+
+    if (!response.ok) {
+        throw new Error('Candidature introuvable');
+    }
+
+    return response.json();
+}
+
+export type ApplicationEvent = {
+    id: number;
+    type:
+        | 'CREATED'
+        | 'STATUS_CHANGED'
+        | 'FOLLOW_UP'
+        | 'RESPONSE'
+        | 'INTERVIEW'
+        | 'NOTE';
+    title: string;
+    description: string | null;
+    eventDate: string;
+    createdAt: string;
+    applicationId: number;
+};
+
+export type ApplicationDetails = Application & {
+    events: ApplicationEvent[];
+};
+export type UpdateApplicationData = {
+    status?: ApplicationStatus;
+    company?: string;
+    position?: string;
+    location?: string;
+    contactEmail?: string;
+    contactPhone?: string;
+    followUpAt?: Date;
+};
+
+export async function updateApplication(
+    id: number,
+    data: UpdateApplicationData,
+): Promise<Application> {
+    const response = await fetch(`${API_URL}/applications/${id}`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+        throw new Error('Impossible de modifier la candidature');
+    }
+
+    return response.json();
+}
+
+export async function deleteApplicationEvent(
+    applicationId: number,
+    eventId: number,
+): Promise<void> {
+    const response = await fetch(
+        `${API_URL}/applications/${applicationId}/events/${eventId}`,
+        {
+            method: 'DELETE',
+        },
+    );
+
+    if (!response.ok) {
+        throw new Error('Impossible de supprimer cet événement');
+    }
+}

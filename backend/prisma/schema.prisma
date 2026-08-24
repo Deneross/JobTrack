@@ -1,0 +1,77 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ApplicationStatus {
+  TO_APPLY
+  SENT
+  FOLLOW_UP
+  INTERVIEW
+  REJECTED
+  OFFER
+  ABANDONED
+}
+
+enum ContractType {
+  APPRENTICESHIP
+  INTERNSHIP
+  CDD
+  CDI
+  FREELANCE
+  OTHER
+}
+
+enum EventType {
+  CREATED
+  STATUS_CHANGED
+  FOLLOW_UP
+  RESPONSE
+  INTERVIEW
+  NOTE
+}
+
+model Event {
+  id            Int         @id @default(autoincrement())
+  type          EventType
+  title         String
+  description   String?
+  eventDate     DateTime    @default(now()) @db.Date
+  createdAt     DateTime    @default(now())
+
+  applicationId Int
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+}
+
+model Application {
+  id             Int               @id @default(autoincrement())
+
+  company        String
+  position       String
+  status         ApplicationStatus @default(SENT)
+
+  sourceUrl      String?
+  location       String?
+  contractType   ContractType?
+  salary         String?
+  jobDescription String?
+
+  contactEmail   String?
+  contactPhone   String?
+
+  // Dates métier : jour uniquement
+  appliedAt      DateTime          @default(now()) @db.Date
+  followUpAt     DateTime?         @db.Date
+
+  // Dates techniques
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  //Event
+  events Event[]
+}

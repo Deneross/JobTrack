@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Application" ALTER COLUMN "appliedAt" SET DATA TYPE DATE,
+ALTER COLUMN "followUpAt" SET DATA TYPE DATE;

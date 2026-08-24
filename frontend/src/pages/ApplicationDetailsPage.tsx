@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams,useNavigate} from 'react-router-dom';
+import { EventForm } from '../components/EventForm';
+import { ApplicationEditForm } from '../components/ApplicationEditForm';
+
 
 import {
+    deleteApplication,
     deleteApplicationEvent,
     getApplication,
     updateApplication,
@@ -11,6 +15,8 @@ import {
 
 export function ApplicationDetailsPage() {
     const { id } = useParams();
+
+    const navigate = useNavigate();
 
     const [application, setApplication] =
         useState<ApplicationDetails | null>(null);
@@ -30,6 +36,38 @@ export function ApplicationDetailsPage() {
             .catch(() => setError('Candidature introuvable'))
             .finally(() => setLoading(false));
     }, [id]);
+
+    async function handleDeleteApplication() {
+        if (!application) {
+            return;
+        }
+
+        const confirmed = window.confirm(
+            `Supprimer définitivement la candidature chez ${application.company} ?`,
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        try {
+            await deleteApplication(application.id);
+            navigate('/');
+        } catch {
+            setError('Impossible de supprimer la candidature');
+        }
+    }
+
+    async function reloadApplication() {
+        if (!application) {
+            return;
+        }
+
+        const updatedApplication =
+            await getApplication(application.id);
+
+        setApplication(updatedApplication);
+    }
 
     async function handleDeleteEvent(eventId: number) {
         if (!application) {
@@ -114,6 +152,16 @@ export function ApplicationDetailsPage() {
                 <p>Téléphone : {application.contactPhone}</p>
             )}
 
+            <ApplicationEditForm
+                application={application}
+                onUpdated={() => void reloadApplication()}
+            />
+
+            <EventForm
+                applicationId={application.id}
+                onEventCreated={() => void reloadApplication()}
+            />
+
             <h2>Historique</h2>
 
             {application.events.length === 0 ? (
@@ -148,6 +196,13 @@ export function ApplicationDetailsPage() {
                     })}
                 </ul>
             )}
+
+            <button
+                type="button"
+                onClick={() => void handleDeleteApplication()}
+            >
+                Supprimer la candidature
+            </button>
         </main>
     );
 }

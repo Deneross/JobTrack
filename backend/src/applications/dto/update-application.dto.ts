@@ -58,5 +58,10 @@ export class UpdateApplicationDto {
     @IsOptional()
     @Type(() => Date)
     @IsDate()
+    appliedAt?: Date;
+
+    @IsOptional()
+    @Type(() => Date)
+    @IsDate()
     followUpAt?: Date;
 }

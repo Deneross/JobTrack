@@ -7,6 +7,20 @@ export type ApplicationStatus =
     | 'OFFER'
     | 'ABANDONED';
 
+export type ContractType =
+    | 'APPRENTICESHIP'
+    | 'INTERNSHIP'
+    | 'CDD'
+    | 'CDI'
+    | 'FREELANCE'
+    | 'OTHER';
+
+export type EventType =
+    | 'FOLLOW_UP'
+    | 'RESPONSE'
+    | 'INTERVIEW'
+    | 'NOTE';
+
 export type Application = {
     id: number;
     company: string;
@@ -14,7 +28,7 @@ export type Application = {
     status: ApplicationStatus;
     sourceUrl: string | null;
     location: string | null;
-    contractType: string | null;
+    contractType: ContractType | null;
     salary: string | null;
     jobDescription: string | null;
     contactEmail: string | null;
@@ -24,50 +38,6 @@ export type Application = {
     createdAt: string;
     updatedAt: string;
 };
-
-const API_URL = 'http://localhost:3000';
-
-export async function getApplications(): Promise<Application[]> {
-    const response = await fetch(`${API_URL}/applications`);
-
-    if (!response.ok) {
-        throw new Error('Impossible de récupérer les candidatures');
-    }
-
-    return response.json();
-}
-
-export type DashboardStats = {
-    total: number;
-    active: number;
-    dueFollowUps: number;
-    interviews: number;
-    byStatus: Record<string, number>;
-};
-
-export async function getDashboardStats(): Promise<DashboardStats> {
-    const response = await fetch(
-        `${API_URL}/applications/dashboard/stats`,
-    );
-
-    if (!response.ok) {
-        throw new Error('Impossible de récupérer les statistiques');
-    }
-
-    return response.json();
-}
-
-export async function getApplication(
-    id: number,
-): Promise<ApplicationDetails> {
-    const response = await fetch(`${API_URL}/applications/${id}`);
-
-    if (!response.ok) {
-        throw new Error('Candidature introuvable');
-    }
-
-    return response.json();
-}
 
 export type ApplicationEvent = {
     id: number;
@@ -88,15 +58,71 @@ export type ApplicationEvent = {
 export type ApplicationDetails = Application & {
     events: ApplicationEvent[];
 };
+
+export type DashboardStats = {
+    total: number;
+    active: number;
+    dueFollowUps: number;
+    interviews: number;
+    byStatus: Record<string, number>;
+};
+
 export type UpdateApplicationData = {
-    status?: ApplicationStatus;
     company?: string;
     position?: string;
+    status?: ApplicationStatus;
+    sourceUrl?: string;
     location?: string;
+    contractType?: ContractType;
+    salary?: string;
+    jobDescription?: string;
     contactEmail?: string;
     contactPhone?: string;
-    followUpAt?: Date;
+    appliedAt?: string;
+    followUpAt?: string;
 };
+
+export type CreateEventData = {
+    type: EventType;
+    title: string;
+    description?: string;
+};
+
+const API_URL = 'http://localhost:3000';
+
+export async function getApplications(): Promise<Application[]> {
+    const response = await fetch(`${API_URL}/applications`);
+
+    if (!response.ok) {
+        throw new Error('Impossible de récupérer les candidatures');
+    }
+
+    return response.json();
+}
+
+export async function getApplication(
+    id: number,
+): Promise<ApplicationDetails> {
+    const response = await fetch(`${API_URL}/applications/${id}`);
+
+    if (!response.ok) {
+        throw new Error('Candidature introuvable');
+    }
+
+    return response.json();
+}
+
+export async function getDashboardStats(): Promise<DashboardStats> {
+    const response = await fetch(
+        `${API_URL}/applications/dashboard/stats`,
+    );
+
+    if (!response.ok) {
+        throw new Error('Impossible de récupérer les statistiques');
+    }
+
+    return response.json();
+}
 
 export async function updateApplication(
     id: number,
@@ -117,6 +143,28 @@ export async function updateApplication(
     return response.json();
 }
 
+export async function createApplicationEvent(
+    applicationId: number,
+    data: CreateEventData,
+): Promise<ApplicationEvent> {
+    const response = await fetch(
+        `${API_URL}/applications/${applicationId}/events`,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        },
+    );
+
+    if (!response.ok) {
+        throw new Error("Impossible d'ajouter l'événement");
+    }
+
+    return response.json();
+}
+
 export async function deleteApplicationEvent(
     applicationId: number,
     eventId: number,
@@ -129,6 +177,16 @@ export async function deleteApplicationEvent(
     );
 
     if (!response.ok) {
-        throw new Error('Impossible de supprimer cet événement');
+        throw new Error("Impossible de supprimer l'événement");
+    }
+}
+
+export async function deleteApplication(id: number): Promise<void> {
+    const response = await fetch(`${API_URL}/applications/${id}`, {
+        method: 'DELETE',
+    });
+
+    if (!response.ok) {
+        throw new Error('Impossible de supprimer la candidature');
     }
 }

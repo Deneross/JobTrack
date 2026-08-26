@@ -63,5 +63,5 @@ export class UpdateApplicationDto {
     @IsOptional()
     @Type(() => Date)
     @IsDate()
-    followUpAt?: Date;
+    followUpAt?: Date | null;
 }

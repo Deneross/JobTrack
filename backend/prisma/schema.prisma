@@ -13,9 +13,17 @@ enum ApplicationStatus {
   SENT
   FOLLOW_UP
   INTERVIEW
+  WAITING_RESPONSE
   REJECTED
   OFFER
   ABANDONED
+}
+
+enum InterviewOutcome {
+  WAITING_RESPONSE
+  NEXT_INTERVIEW
+  REJECTED
+  OFFER
 }
 
 enum ContractType {
@@ -34,6 +42,29 @@ enum EventType {
   RESPONSE
   INTERVIEW
   NOTE
+}
+
+enum InterviewType {
+  HR
+  TECHNICAL
+  MANAGER
+  OTHER
+}
+
+model Interview {
+  id            Int               @id @default(autoincrement())
+  type          InterviewType
+  scheduledAt   DateTime
+  location      String?
+  notes         String?
+
+  completedAt   DateTime?
+  outcome       InterviewOutcome?
+
+  applicationId Int
+  application   Application       @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  createdAt     DateTime          @default(now())
 }
 
 model Event {
@@ -74,4 +105,7 @@ model Application {
 
   //Event
   events Event[]
+
+  //Interview
+  interviews Interview[]
 }

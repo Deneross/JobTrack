@@ -61,7 +61,6 @@ export function EventForm({
                     >
                         <option value="FOLLOW_UP">Relance</option>
                         <option value="RESPONSE">Réponse</option>
-                        <option value="INTERVIEW">Entretien</option>
                         <option value="NOTE">Note</option>
                     </select>
                 </div>

@@ -3,11 +3,14 @@ type StatsCardProps = {
     value: number;
 };
 
-export function StatsCard({ title, value }: StatsCardProps) {
+export function StatsCard({
+                              title,
+                              value,
+                          }: StatsCardProps) {
     return (
-        <article>
-            <h3>{title}</h3>
-            <strong>{value}</strong>
+        <article className="stats-card">
+            <span className="stats-card__label">{title}</span>
+            <strong className="stats-card__value">{value}</strong>
         </article>
     );
 }

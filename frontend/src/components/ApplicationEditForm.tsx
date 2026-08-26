@@ -27,9 +27,7 @@ export function ApplicationEditForm({
         application.appliedAt.slice(0, 10),
     );
 
-    const [followUpAt, setFollowUpAt] = useState(
-        application.followUpAt?.slice(0, 10) ?? '',
-    );
+
     const [company, setCompany] = useState(application.company);
     const [position, setPosition] = useState(application.position);
     const [location, setLocation] = useState(application.location ?? '');
@@ -61,7 +59,6 @@ export function ApplicationEditForm({
                 contractType: contractType || undefined,
                 jobDescription: jobDescription || undefined,
                 appliedAt,
-                followUpAt: followUpAt || undefined,
             });
 
             onUpdated();
@@ -179,16 +176,6 @@ export function ApplicationEditForm({
                         type="date"
                         value={appliedAt}
                         onChange={(e) => setAppliedAt(e.target.value)}
-                    />
-                </div>
-
-                <div>
-                    <label htmlFor="editFollowUpAt">Prochaine relance</label>
-                    <input
-                        id="editFollowUpAt"
-                        type="date"
-                        value={followUpAt}
-                        onChange={(e) => setFollowUpAt(e.target.value)}
                     />
                 </div>
 

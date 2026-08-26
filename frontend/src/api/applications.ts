@@ -21,6 +21,30 @@ export type EventType =
     | 'INTERVIEW'
     | 'NOTE';
 
+export type InterviewType =
+    | 'HR'
+    | 'TECHNICAL'
+    | 'MANAGER'
+    | 'OTHER';
+
+export type InterviewOutcome =
+    | 'WAITING_RESPONSE'
+    | 'NEXT_INTERVIEW'
+    | 'REJECTED'
+    | 'OFFER';
+
+export type Interview = {
+    id: number;
+    type: InterviewType;
+    scheduledAt: string;
+    location: string | null;
+    notes: string | null;
+    completedAt: string | null;
+    outcome: InterviewOutcome | null;
+    applicationId: number;
+    createdAt: string;
+};
+
 export type Application = {
     id: number;
     company: string;
@@ -57,6 +81,7 @@ export type ApplicationEvent = {
 
 export type ApplicationDetails = Application & {
     events: ApplicationEvent[];
+    interviews: Interview[];
 };
 
 export type DashboardStats = {
@@ -81,6 +106,53 @@ export type UpdateApplicationData = {
     appliedAt?: string;
     followUpAt?: string;
 };
+
+export type UpdateInterviewData = {
+    type?: InterviewType;
+    scheduledAt?: string;
+    location?: string;
+    notes?: string;
+    outcome?: InterviewOutcome;
+};
+
+export async function deleteInterview(
+    applicationId: number,
+    interviewId: number,
+): Promise<void> {
+    const response = await fetch(
+        `${API_URL}/applications/${applicationId}/interviews/${interviewId}`,
+        {
+            method: 'DELETE',
+        },
+    );
+
+    if (!response.ok) {
+        throw new Error("Impossible de supprimer l'entretien");
+    }
+}
+
+export async function updateInterview(
+    applicationId: number,
+    interviewId: number,
+    data: UpdateInterviewData,
+): Promise<Interview> {
+    const response = await fetch(
+        `${API_URL}/applications/${applicationId}/interviews/${interviewId}`,
+        {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        },
+    );
+
+    if (!response.ok) {
+        throw new Error("Impossible de modifier l'entretien");
+    }
+
+    return response.json();
+}
 
 export type CreateEventData = {
     type: EventType;
@@ -180,6 +252,17 @@ export async function deleteApplicationEvent(
         throw new Error("Impossible de supprimer l'événement");
     }
 }
+export async function getDueFollowUps(): Promise<Application[]> {
+    const response = await fetch(
+        `${API_URL}/applications/follow-ups/due`,
+    );
+
+    if (!response.ok) {
+        throw new Error('Impossible de récupérer les relances');
+    }
+
+    return response.json();
+}
 
 export async function deleteApplication(id: number): Promise<void> {
     const response = await fetch(`${API_URL}/applications/${id}`, {
@@ -188,5 +271,55 @@ export async function deleteApplication(id: number): Promise<void> {
 
     if (!response.ok) {
         throw new Error('Impossible de supprimer la candidature');
+    }
+}
+
+export type CreateInterviewData = {
+    type: InterviewType;
+    scheduledAt: string;
+    location?: string;
+    notes?: string;
+};
+
+export async function createInterview(
+    applicationId: number,
+    data: CreateInterviewData,
+): Promise<Interview> {
+    const response = await fetch(
+        `${API_URL}/applications/${applicationId}/interviews`,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        },
+    );
+
+    if (!response.ok) {
+        throw new Error("Impossible de créer l'entretien");
+    }
+
+    return response.json();
+}
+
+export async function completeInterview(
+    applicationId: number,
+    interviewId: number,
+    outcome: InterviewOutcome,
+): Promise<void> {
+    const response = await fetch(
+        `${API_URL}/applications/${applicationId}/interviews/${interviewId}/complete`,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ outcome }),
+        },
+    );
+
+    if (!response.ok) {
+        throw new Error("Impossible de terminer l'entretien");
     }
 }

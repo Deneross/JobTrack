@@ -23,3 +23,13 @@ export function addDaysToToday(days: number): Date {
 
     return today;
 }
+export function addDaysToDate(
+    date: Date,
+    days: number,
+): Date {
+    const result = new Date(date);
+
+    result.setUTCDate(result.getUTCDate() + days);
+
+    return result;
+}

@@ -1,1 +1,1 @@
-DELETE http://localhost:3000/applications/3/events/1
+GET http://localhost:3000/applications/4
